@@ -1,0 +1,13 @@
+{
+  "description": "Multi-field form with various input types",
+  "html_snippet": "\n    <form>\n        <input type=\"text\" placeholder=\"First Name\" />\n        <input type=\"email\" placeholder=\"Email\" />\n        <input type=\"password\" placeholder=\"Password\" />\n        <textarea placeholder=\"Comments\"></textarea>\n        <button type=\"submit\">Submit</button>\n    </form>\n    ",
+  "expected_elements_count": 5,
+  "expected_roles": [
+    "input",
+    "input",
+    "input",
+    "textarea",
+    "button"
+  ],
+  "notes": "Validates semantic extraction of various input types"
+}

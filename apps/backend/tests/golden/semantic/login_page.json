@@ -1,0 +1,35 @@
+{
+  "description": "Login page with username/password fields and login button",
+  "html_snippet": "\n    <form id=\"login-form\">\n        <input id=\"username\" name=\"username\" type=\"text\" placeholder=\"Username\" />\n        <input id=\"password\" name=\"password\" type=\"password\" placeholder=\"Password\" />\n        <button id=\"login\" type=\"submit\">Login</button>\n    </form>\n    ",
+  "expected_elements": [
+    {
+      "selector": "#username",
+      "role": "username_input",
+      "label": "Username",
+      "confidence_range": [
+        0.85,
+        1.0
+      ]
+    },
+    {
+      "selector": "#password",
+      "role": "password_input",
+      "label": "Password",
+      "confidence_range": [
+        0.85,
+        1.0
+      ]
+    },
+    {
+      "selector": "#login",
+      "role": "login_button",
+      "label": "Login",
+      "confidence_range": [
+        0.85,
+        1.0
+      ]
+    }
+  ],
+  "expected_flow_count_min": 0,
+  "notes": "This is a deterministic test. Same input should ALWAYS produce same output."
+}
