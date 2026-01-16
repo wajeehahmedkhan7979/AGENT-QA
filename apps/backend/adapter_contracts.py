@@ -287,7 +287,7 @@ class QueueAdapterError(Exception):
 # ============================================================================
 
 @dataclass
-class TestRunResult:
+class RunResultData:
     """Result of test execution."""
     run_id: str
     job_id: str

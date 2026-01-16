@@ -166,7 +166,7 @@ class TestRunnerAdapterContract:
     
     def test_test_run_result_fields(self):
         """TestRunResult has required fields."""
-        result = TestRunResult(
+        result = RunResultData(
             run_id="run_1",
             job_id="j_1",
             test_id="t_1",

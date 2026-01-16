@@ -1,4 +1,4 @@
-from llm_adapter import MockLLMAdapter
+from mock_llm import MockLLMAdapter
 
 
 def test_mock_llm_generates_login_flow() -> None:

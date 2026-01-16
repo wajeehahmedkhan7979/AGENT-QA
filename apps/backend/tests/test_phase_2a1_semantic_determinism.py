@@ -11,12 +11,12 @@ from pathlib import Path
 
 # Import semantic functions - adjust path as needed
 try:
-    from semantic import extract_semantic_model, _build_selector
+    from semantic import build_semantic_model, _build_selector
 except ImportError:
     # For running from test directory
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent))
-    from semantic import extract_semantic_model, _build_selector
+    from semantic import build_semantic_model, _build_selector
 
 
 def load_golden_fixture(fixture_name: str) -> dict:
