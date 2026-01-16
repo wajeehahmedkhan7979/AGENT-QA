@@ -3,36 +3,49 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 Push-Location $ScriptDir
 
 Write-Host "Starting core containers..."
-docker-compose up -d --build backend sample-app db redis
+# Use docker compose (modern syntax) instead of docker-compose
+docker compose up -d --build backend sample-app db redis
 
 Write-Host "Waiting for backend to be healthy..."
 $attempts = 0
 while ($attempts -lt 30) {
   try {
-    $r = Invoke-WebRequest -UseBasicParsing -Uri 'http://localhost:8000/health' -ErrorAction Stop -TimeoutSec 2
-    if ($r.StatusCode -eq 200) { break }
-  } catch { }
-  Start-Sleep -Seconds 2
-  $attempts++
+    $r = Invoke-WebRequest -UseBasicParsing -Uri 'http://localhost:8000/health' -ErrorAction Stop
+    Write-Host "[OK] Backend is healthy!"
+    break
+  } catch {
+    $attempts++
+    Write-Host "  Attempt $attempts/30 - backend not yet healthy..."
+    Start-Sleep -Seconds 2
+  }
 }
+
 if ($attempts -ge 30) {
-  Write-Error 'Backend did not become healthy in time'
-  docker-compose down -v
-  Pop-Location
+  Write-Host "[ERROR] Backend did not become healthy in time"
   exit 1
 }
 
-Write-Host "Backend healthy; creating a demo job..."
-$body = '{
-  "targetUrl":"http://sample-app:3000/sample-app/login",
-  "scope":"read-only",
-  "testProfile":"functional",
-  "ownerId":"ci_user"
-}'
+Write-Host "Running smoke test: creating a job..."
+$body = @{
+  targetUrl = "http://sample-app:3000/sample-app/login"
+  scope = "read-only"
+  testProfile = "functional"
+  ownerId = "ci_user"
+} | ConvertTo-Json
 
-Invoke-RestMethod -Method Post -Uri 'http://localhost:8000/jobs' -ContentType 'application/json' -Body $body
+try {
+  $response = Invoke-WebRequest -UseBasicParsing -Uri 'http://localhost:8000/jobs' `
+    -Method Post `
+    -Headers @{'Content-Type'='application/json'} `
+    -Body $body `
+    -ErrorAction Stop
+  Write-Host "[OK] Job creation succeeded"
+  Write-Host "Response: $($response.Content)"
+} catch {
+  Write-Host "[ERROR] Job creation failed: $($_.Exception.Message)"
+  exit 1
+}
 
-Write-Host "Smoke POST completed; tearing down containers..."
-docker-compose down -v
-
-Pop-Location
+Write-Host "Cleaning up containers..."
+docker compose down -v
+Write-Host "[OK] Smoke test completed successfully!"

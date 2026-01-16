@@ -4,7 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-docker-compose up -d --build backend sample-app db redis
+# Use docker compose (modern syntax) instead of docker-compose
+docker compose up -d --build backend sample-app db redis
 
 echo "Waiting for backend to be healthy..."
 attempts=0
@@ -18,9 +19,7 @@ until curl -sf http://localhost:8000/health > /dev/null; do
 done
 
 echo "Backend is healthy, running a simple job creation smoke test..."
-curl -sf -X POST "http://localhost:8000/jobs" \
-  -H "Content-Type: application/json" \
-  -d '{
+curl -sf -X POST "http://localhost:8000/jobs"   -H "Content-Type: application/json"   -d '{
     "targetUrl": "http://sample-app:3000/sample-app/login",
     "scope": "read-only",
     "testProfile": "functional",
@@ -29,5 +28,4 @@ curl -sf -X POST "http://localhost:8000/jobs" \
 
 echo "Smoke test succeeded."
 
-docker-compose down -v
-
+docker compose down -v
