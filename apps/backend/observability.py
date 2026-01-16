@@ -83,7 +83,7 @@ class StructuredLogger:
             TimelineEntry (dict) that was logged
         """
         details = details or {}
-        timestamp = datetime.now(timezone.utc).isoformat()
+        timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         
         entry = TimelineEntry(
             job_id=self.job_id,

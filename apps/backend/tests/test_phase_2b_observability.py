@@ -321,10 +321,9 @@ class TestErrorHandling:
         """Malformed JSONL lines are skipped gracefully."""
         logger = StructuredLogger("job_1", temp_log_dir)
         
-        # Manually write a malformed line
+        # Manually write a malformed line followed by a valid one
         with open(logger.log_file, "w") as f:
-            f.write("{invalid json
-")
+            f.write("invalid json line\n")
             f.write('{"valid": "json"}\n')
         
         entries = logger.read_timeline()
