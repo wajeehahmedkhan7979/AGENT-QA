@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: qa_user
+          POSTGRES_PASSWORD: qa_pass
+          POSTGRES_DB: qa_demo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U qa_user -d qa_demo"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          pip install -r apps/backend/requirements.txt
+
+      - name: Run backend unit tests (pytest)
+        run: |
+          pytest apps/backend -q
+
+      - name: Dev setup (create venv & run backend tests)
+        run: |
+          bash infra/dev_setup.sh
+
+      - name: Run docker-compose smoke test
+        run: |
+          cd infra
+          chmod +x smoke.sh
+          ./smoke.sh
+
