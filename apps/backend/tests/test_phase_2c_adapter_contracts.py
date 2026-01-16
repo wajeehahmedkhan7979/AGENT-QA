@@ -21,7 +21,7 @@ from adapter_contracts import (
     StorageAdapterError,
     QueueAdapterContract,
     QueueAdapterError,
-    TestRunResult,
+    RunResultData,
     RunnerAdapterContract,
     RunnerAdapterError,
     ValidatorAdapterContract,
