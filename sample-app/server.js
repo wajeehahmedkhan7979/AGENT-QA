@@ -40,7 +40,7 @@ app.get("/sample-app/login", (_req, res) => {
         </form>
         <script>
           document.getElementById("login").addEventListener("click", function () {
-            // Deterministic, read-only \"login\" that just updates text on the page.
+            // Deterministic, read-only "login" that just updates text on the page.
             const msg = document.createElement("h2");
             msg.textContent = "Welcome";
             document.body.appendChild(msg);
@@ -53,6 +53,5 @@ app.get("/sample-app/login", (_req, res) => {
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log(\`Sample app listening on port \${PORT}\`);
+  console.log(`Sample app listening on port ${PORT}`);
 });
-
