@@ -34,3 +34,82 @@ def classify_element(label: str, tag_name: str) -> ClassifiedElement:
 
     return ClassifiedElement(role="generic", confidence=0.5)
 
+
+
+@dataclass
+class GeneratedTestStep:
+    """Represents a single test step."""
+    action: str
+    selector: str = ""
+    value: str = ""
+    url: str = ""
+    expectedText: str = ""
+    
+    def get(self, key: str, default=None):
+        """Dict-like interface for backwards compatibility."""
+        return getattr(self, key, default)
+
+
+@dataclass
+class GeneratedTestResult:
+    """Represents a generated test."""
+    test_id: str
+    job_id: str
+    steps: list
+    confidence: float
+
+
+class MockLLMAdapter:
+    """Mock LLM adapter that generates deterministic test cases."""
+    
+    def __init__(self):
+        self.test_counter = 0
+    
+    def generate_tests(self, job_id: str, semantic_model: dict) -> GeneratedTestResult:
+        """
+        Generate a test from a semantic model.
+        
+        Args:
+            job_id: Job identifier
+            semantic_model: Semantic model dict with elements, flows
+            
+        Returns:
+            GeneratedTestResult with test steps
+        """
+        self.test_counter += 1
+        test_id = f"t_{self.test_counter}"
+        
+        # Extract elements
+        elements = semantic_model.get("elements", [])
+        
+        # Build test steps from elements
+        steps = []
+        
+        # First step: navigate
+        steps.append({"action": "goto", "url": "https://example.com", "selector": "", "value": ""})
+        
+        # Add interaction steps for each element
+        for element in elements:
+            role = element.get("role", "")
+            selector = element.get("selector", "")
+            label = element.get("label", "")
+            
+            if role == "username_input":
+                steps.append({"action": "fill", "selector": selector, "value": "testuser"})
+            elif role == "password_input":
+                steps.append({"action": "fill", "selector": selector, "value": "testpass"})
+            elif role == "login_button":
+                steps.append({"action": "click", "selector": selector})
+            elif role == "button":
+                steps.append({"action": "click", "selector": selector})
+        
+        # Add assertion step
+        if elements:
+            steps.append({"action": "assert", "selector": "body", "expectedText": "success"})
+        
+        return GeneratedTestResult(
+            test_id=test_id,
+            job_id=job_id,
+            steps=steps,
+            confidence=0.92
+        )
